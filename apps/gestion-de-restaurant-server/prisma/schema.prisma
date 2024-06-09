@@ -1,0 +1,165 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Utilisateur {
+  createdAt          DateTime           @default(now())
+  email              String?
+  id                 String             @id @default(cuid())
+  localisationLat    Float?
+  localisationLon    Float?
+  motDePasse         String?
+  nom                String?
+  nomEntiteJuridique String?
+  numeroTelephone    String?
+  numeroTva          String?
+  restaurantEntities RestaurantEntity[]
+  restaurants        Restaurant[]
+  typeCommerce       String?
+  updatedAt          DateTime           @updatedAt
+}
+
+model Restaurant {
+  createdAt       DateTime     @default(now())
+  foodBaskets     FoodBasket[]
+  id              String       @id @default(cuid())
+  localisationLat Float?
+  localisationLon Float?
+  nom             String?
+  numeroTelephone String?
+  paniers         Panier[]
+  typeCommerce    String?
+  updatedAt       DateTime     @updatedAt
+  utilisateur     Utilisateur? @relation(fields: [utilisateurId], references: [id])
+  utilisateurId   String?
+}
+
+model Remboursement {
+  createdAt         DateTime  @default(now())
+  dateRemboursement DateTime?
+  id                String    @id @default(cuid())
+  montant           Float?
+  updatedAt         DateTime  @updatedAt
+  vente             Vente?    @relation(fields: [venteId], references: [id])
+  venteId           String?
+}
+
+model Panier {
+  annulations    Annulation[]
+  cancellations  Cancellation[]
+  co2Evite       Float?
+  createdAt      DateTime       @default(now())
+  description    String?
+  id             String         @id @default(cuid())
+  listeRepas     Json?
+  nom            String?
+  nombreRestants Int?
+  nombreVendus   Int?
+  prix           Float?
+  restaurant     Restaurant?    @relation(fields: [restaurantId], references: [id])
+  restaurantId   String?
+  sales          Sale[]
+  updatedAt      DateTime       @updatedAt
+  ventes         Vente[]
+}
+
+model Vente {
+  co2Evite        Float?
+  createdAt       DateTime        @default(now())
+  dateVente       DateTime?
+  id              String          @id @default(cuid())
+  methodePaiement String?
+  panier          Panier?         @relation(fields: [panierId], references: [id])
+  panierId        String?
+  quantiteVendue  Int?
+  refunds         Refund[]
+  remboursements  Remboursement[]
+  updatedAt       DateTime        @updatedAt
+}
+
+model Annulation {
+  createdAt      DateTime  @default(now())
+  dateAnnulation DateTime?
+  id             String    @id @default(cuid())
+  panier         Panier?   @relation(fields: [panierId], references: [id])
+  panierId       String?
+  raison         String?
+  updatedAt      DateTime  @updatedAt
+}
+
+model User {
+  createdAt DateTime @default(now())
+  email     String?  @unique
+  firstName String?
+  id        String   @id @default(cuid())
+  lastName  String?
+  password  String
+  roles     Json
+  updatedAt DateTime @updatedAt
+  username  String   @unique
+}
+
+model FoodBasket {
+  co2Evite       Float?
+  createdAt      DateTime    @default(now())
+  description    String?
+  id             String      @id @default(cuid())
+  listeRepas     Json?
+  nom            String?
+  nombreRestants Int?
+  nombreVendus   Int?
+  prix           Float?
+  restaurant     Restaurant? @relation(fields: [restaurantId], references: [id])
+  restaurantId   String?
+  updatedAt      DateTime    @updatedAt
+}
+
+model RestaurantEntity {
+  createdAt       DateTime     @default(now())
+  id              String       @id @default(cuid())
+  localisationLat Float?
+  localisationLon Float?
+  nom             String?
+  numeroTelephone String?
+  typeCommerce    String?
+  updatedAt       DateTime     @updatedAt
+  utilisateur     Utilisateur? @relation(fields: [utilisateurId], references: [id])
+  utilisateurId   String?
+}
+
+model Sale {
+  co2Evite        Float?
+  createdAt       DateTime  @default(now())
+  dateVente       DateTime?
+  id              String    @id @default(cuid())
+  methodePaiement String?
+  panier          Panier?   @relation(fields: [panierId], references: [id])
+  panierId        String?
+  quantiteVendue  Int?
+  updatedAt       DateTime  @updatedAt
+}
+
+model Cancellation {
+  createdAt      DateTime  @default(now())
+  dateAnnulation DateTime?
+  id             String    @id @default(cuid())
+  panier         Panier?   @relation(fields: [panierId], references: [id])
+  panierId       String?
+  raison         String?
+  updatedAt      DateTime  @updatedAt
+}
+
+model Refund {
+  createdAt         DateTime  @default(now())
+  dateRemboursement DateTime?
+  id                String    @id @default(cuid())
+  montant           Float?
+  updatedAt         DateTime  @updatedAt
+  vente             Vente?    @relation(fields: [venteId], references: [id])
+  venteId           String?
+}
